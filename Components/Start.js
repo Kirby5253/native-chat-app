@@ -12,7 +12,7 @@ export default class Start extends React.Component {
 
 		this.state = {
 			name: '',
-			background: ''
+			background: '#090C08'
 		};
 	}
 
@@ -32,33 +32,69 @@ export default class Start extends React.Component {
 							<Text style={styles.chooseColor}>Choose Background Color:</Text>
 							<View style={styles.colorContainer}>
 								<TouchableOpacity onPress={() => this.setState({ background: '#090C08' })}>
-									<View style={styles.colorBubbles} />
+									<View
+										style={[
+											styles.colorBubbles1,
+											this.state.background === '#090C08'
+												? styles.colorBubblesExp
+												: styles.colorBubblesNotActive
+										]}
+									>
+										<View style={[ styles.colorBubbles, styles.colorBubbles1 ]} />
+									</View>
 								</TouchableOpacity>
 
-								<TouchableOpacity onPress={() => this.setState({ background: '#474056' })}>
-									<View style={[ styles.colorBubbles, styles.colorBubbles2 ]} />
-								</TouchableOpacity>
+								<View
+									style={[
+										styles.colorBubbles2,
+										this.state.background === '#474056'
+											? styles.colorBubblesExp
+											: styles.colorBubblesNotActive
+									]}
+								>
+									<TouchableOpacity onPress={() => this.setState({ background: '#474056' })}>
+										<View style={[ styles.colorBubbles, styles.colorBubbles2 ]} />
+									</TouchableOpacity>
+								</View>
 
-								<TouchableOpacity onPress={() => this.setState({ background: '#8A95A5' })}>
-									<View style={[ styles.colorBubbles, styles.colorBubbles3 ]} />
-								</TouchableOpacity>
+								<View
+									style={[
+										styles.colorBubbles3,
+										this.state.background === '#8A95A5'
+											? styles.colorBubblesExp
+											: styles.colorBubblesNotActive
+									]}
+								>
+									<TouchableOpacity onPress={() => this.setState({ background: '#8A95A5' })}>
+										<View style={[ styles.colorBubbles, styles.colorBubbles3 ]} />
+									</TouchableOpacity>
+								</View>
 
-								<TouchableOpacity onPress={() => this.setState({ background: '#B9C6AE' })}>
-									<View style={[ styles.colorBubbles, styles.colorBubbles4 ]} />
-								</TouchableOpacity>
+								<View
+									style={[
+										styles.colorBubbles4,
+										this.state.background === '#B9C6AE'
+											? styles.colorBubblesExp
+											: styles.colorBubblesNotActive
+									]}
+								>
+									<TouchableOpacity onPress={() => this.setState({ background: '#B9C6AE' })}>
+										<View style={[ styles.colorBubbles, styles.colorBubbles4 ]} />
+									</TouchableOpacity>
+								</View>
 							</View>
 						</View>
-						<View style={styles.chatButton}>
-							<Button
-								color="#757083"
-								title="Start Chatting"
-								onPress={() =>
-									this.props.navigation.navigate('Chat', {
-										name: this.state.name,
-										background: this.state.background
-									})}
-							/>
-						</View>
+
+						<TouchableOpacity
+							style={styles.chatButton}
+							onPress={() =>
+								this.props.navigation.navigate('Chat', {
+									name: this.state.name,
+									background: this.state.background
+								})}
+						>
+							<Text style={styles.chatButtonText}>Start Chatting</Text>
+						</TouchableOpacity>
 					</View>
 				</ImageBackground>
 			</View>
@@ -115,29 +151,37 @@ const styles = StyleSheet.create({
 		opacity: 50
 	},
 	chatButton: {
-		fontSize: 16,
-		fontWeight: '600',
-		color: '#FFFFFF',
 		backgroundColor: '#757083',
 		width: '88%',
 		marginBottom: 5,
-		textTransform: 'lowercase'
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+		height: '15%'
+	},
+	chatButtonText: {
+		fontSize: 16,
+		fontWeight: '600',
+		color: '#FFFFFF'
 	},
 	colorContainer: {
 		flexDirection: 'row',
 		alignSelf: 'flex-start',
 		width: '80%',
-		justifyContent: 'space-around'
+		justifyContent: 'space-around',
+		alignItems: 'center'
 	},
 	colorBubbles: {
 		position: 'relative',
-		backgroundColor: '#090C08',
 		width: 40,
 		height: 40,
 		borderRadius: 20,
 		margin: 2,
-		borderWidth: 0,
+		borderWidth: 2,
 		borderColor: 'white'
+	},
+	colorBubbles1: {
+		backgroundColor: '#090C08'
 	},
 	colorBubbles2: {
 		backgroundColor: '#474056'
@@ -147,5 +191,16 @@ const styles = StyleSheet.create({
 	},
 	colorBubbles4: {
 		backgroundColor: '#B9C6AE'
+	},
+	colorBubblesExp: {
+		width: 50,
+		height: 50,
+		borderRadius: 25,
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center'
+	},
+	colorBubblesNotActive: {
+		backgroundColor: 'white'
 	}
 });
