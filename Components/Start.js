@@ -19,36 +19,50 @@ export default class Start extends React.Component {
 	render() {
 		return (
 			<View style={styles.container}>
+
+				{/* Sets the background for the app */}
 				<ImageBackground source={image} style={styles.image}>
+					
+					{/* App Title */}
 					<Text style={styles.header}>Kirby's Chat App</Text>
+
+					{/* Main interactive section of start page  */}
 					<View style={styles.container2}>
+
+						{/* Allow users to enter their name */}
 						<TextInput
 							style={styles.nameInputField}
 							placeholder="Your Name"
 							onChangeText={(name) => this.setState({ name })}
 							value={this.state.name}
 						/>
+
+						{/* Grouping of the color selection section */}
 						<View style={styles.colorPickContainer}>
 							<Text style={styles.chooseColor}>Choose Background Color:</Text>
+
+							{/* Contains the color bubbles */}
 							<View style={styles.colorContainer}>
-								<TouchableOpacity onPress={() => this.setState({ background: '#090C08' })}>
-									<View
+
+								{/* First color bubble selector */}
+								<View
 										style={[
 											styles.colorBubbles1,
 											this.state.background === '#090C08'
-												? styles.colorBubblesExp
+												? styles.colorBubblesRing
 												: styles.colorBubblesNotActive
-										]}
-									>
+										]}>
+									<TouchableOpacity onPress={() => this.setState({ background: '#090C08' })}>
 										<View style={[ styles.colorBubbles, styles.colorBubbles1 ]} />
-									</View>
-								</TouchableOpacity>
+									</TouchableOpacity>
+								</View>
 
+								{/* Second color bubble selector */}
 								<View
 									style={[
 										styles.colorBubbles2,
 										this.state.background === '#474056'
-											? styles.colorBubblesExp
+											? styles.colorBubblesRing
 											: styles.colorBubblesNotActive
 									]}
 								>
@@ -57,11 +71,12 @@ export default class Start extends React.Component {
 									</TouchableOpacity>
 								</View>
 
+								{/*Third color bubble selector */}
 								<View
 									style={[
 										styles.colorBubbles3,
 										this.state.background === '#8A95A5'
-											? styles.colorBubblesExp
+											? styles.colorBubblesRing
 											: styles.colorBubblesNotActive
 									]}
 								>
@@ -70,11 +85,12 @@ export default class Start extends React.Component {
 									</TouchableOpacity>
 								</View>
 
+								{/*Fourth color bubble selector */}
 								<View
 									style={[
 										styles.colorBubbles4,
 										this.state.background === '#B9C6AE'
-											? styles.colorBubblesExp
+											? styles.colorBubblesRing
 											: styles.colorBubblesNotActive
 									]}
 								>
@@ -85,6 +101,7 @@ export default class Start extends React.Component {
 							</View>
 						</View>
 
+						{/* Start the chat button */}
 						<TouchableOpacity
 							style={styles.chatButton}
 							onPress={() =>
@@ -126,6 +143,7 @@ const styles = StyleSheet.create({
 	colorPickContainer: {
 		width: '88%'
 	},
+	// format for app title
 	header: {
 		fontSize: 45,
 		fontWeight: '700',
@@ -133,6 +151,7 @@ const styles = StyleSheet.create({
 		top: 100,
 		color: '#FFFFFF'
 	},
+	// format for the text above color selection
 	chooseColor: {
 		fontSize: 16,
 		fontWeight: '300',
@@ -164,6 +183,7 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 		color: '#FFFFFF'
 	},
+	// box containing the color selections
 	colorContainer: {
 		flexDirection: 'row',
 		alignSelf: 'flex-start',
@@ -171,6 +191,7 @@ const styles = StyleSheet.create({
 		justifyContent: 'space-around',
 		alignItems: 'center'
 	},
+	// format for the color selection bubbles
 	colorBubbles: {
 		position: 'relative',
 		width: 40,
@@ -192,7 +213,8 @@ const styles = StyleSheet.create({
 	colorBubbles4: {
 		backgroundColor: '#B9C6AE'
 	},
-	colorBubblesExp: {
+	// format for the ring around selected color
+	colorBubblesRing: {
 		width: 50,
 		height: 50,
 		borderRadius: 25,

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text } from 'react-native';
+import { GiftedChat } from 'react-native-gifted-chat';
 
 //The apps chat component which renders a chat interface where users select a friend and chat with them
 export default class Chat extends React.Component {
