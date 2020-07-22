@@ -6,8 +6,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 // import the screens we want to navigate
-import Start from './Components/Start';
-import Chat from './Components/Chat';
+import Start from './components/Start';
+import Chat from './components/Chat';
 
 const Stack = createStackNavigator();
 

@@ -21,14 +21,14 @@ export default class Chat extends React.Component {
 					user: {
 						_id: 2,
 						name: 'React Native',
-						avatar: 'https://placeimg.com/140/140/any',
-					},
+						avatar: 'https://placeimg.com/140/140/any'
+					}
 				},
 				{
 					_id: 2,
-					text: name +` has entered the chat.`,
+					text: name + ` has entered the chat.`,
 					createdAt: new Date(),
-					system: true,
+					system: true
 				}
 			]
 		});
@@ -52,14 +52,12 @@ export default class Chat extends React.Component {
 					}
 				}}
 			/>
-		)
+		);
 	}
 
-	// Custom send button color 
+	// Customize blue send button to correct text style change
 	renderSend(props) {
-		return (
-			<Send {...props} textStyle={{ color: 'black'}} label={'Send'} />
-		);
+		return <Send {...props} textStyle={{ color: '#0a84fa' }} label={'Send'} />;
 	}
 
 	render() {
@@ -77,8 +75,10 @@ export default class Chat extends React.Component {
 				}}
 			>
 				<GiftedChat
-					// Allows for black message text for the light background option 
-					textStyle={background === "#B9C6AE" || background === "#8A95A5" ? {color: 'black'} : {color: '#CFD1D2'}}
+					// Allows for black message text for the light background option
+					textStyle={
+						background === '#B9C6AE' || background === '#8A95A5' ? { color: 'black' } : { color: '#CFD1D2' }
+					}
 					// Changes color of the bubble
 					// renderBubble={this.renderBubble.bind(this)}
 					renderSend={this.renderSend.bind(this)}
@@ -88,7 +88,7 @@ export default class Chat extends React.Component {
 						_id: 1
 					}}
 				/>
-				<Send textStyle={{ color: 'red' }} label={'Send'} />
+
 				{/* This currently is not necessary for the current android, it actually breaks the app */}
 				{/* {Platform.OS === 'android' ? <KeyboardSpacer /> : null } */}
 			</View>
