@@ -71,6 +71,10 @@ export default class Chat extends React.Component {
 					uid: user.uid
 				});
 			}
+
+			this.setState({
+				uid: user.uid
+			});
 			//update user state with currently active user data
 
 			// create a reference to the active user's documents
@@ -81,12 +85,12 @@ export default class Chat extends React.Component {
 	}
 
 	componentWillUnmount() {
+		this.logoutMessage(name);
 		// stop listening to authentication
 		this.authUnsubscribe;
 		// stop listening for changes
 		this.unsubscribeMessagesUser;
 		let name = this.props.route.params.name;
-		this.logoutMessage(name);
 	}
 
 	onCollectionUpdate = (querySnapshot) => {
