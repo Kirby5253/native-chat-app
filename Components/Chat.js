@@ -54,6 +54,8 @@ export default class Chat extends React.Component {
 
 	componentDidMount() {
 		let name = this.props.route.params.name;
+
+		// when component mounts, a system message is sent to the chat
 		this.loginMessage(name);
 
 		// listen to authentication events
@@ -65,11 +67,11 @@ export default class Chat extends React.Component {
 					var errorMessage = error.message;
 					console.log(errorCode, errorMessage);
 				});
+				return this.setState({
+					uid: user.uid
+				});
 			}
 			//update user state with currently active user data
-			this.setState({
-				uid: user.uid
-			});
 
 			// create a reference to the active user's documents
 			this.referenceMessagesUser = firebase.firestore().collection('messages').orderBy('createdAt', 'asc');

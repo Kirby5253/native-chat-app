@@ -19,16 +19,13 @@ export default class Start extends React.Component {
 	render() {
 		return (
 			<View style={styles.container}>
-
 				{/* Sets the background for the app */}
 				<ImageBackground source={image} style={styles.image}>
-					
 					{/* App Title */}
 					<Text style={styles.header}>Kirby's Chat App</Text>
 
 					{/* Main interactive section of start page  */}
 					<View style={styles.container2}>
-
 						{/* Allow users to enter their name */}
 						<TextInput
 							style={styles.nameInputField}
@@ -43,15 +40,15 @@ export default class Start extends React.Component {
 
 							{/* Contains the color bubbles */}
 							<View style={styles.colorContainer}>
-
 								{/* First color bubble selector */}
 								<View
-										style={[
-											styles.colorBubbles1,
-											this.state.background === '#090C08'
-												? styles.colorBubblesRing
-												: styles.colorBubblesNotActive
-										]}>
+									style={[
+										styles.colorBubbles1,
+										this.state.background === '#090C08'
+											? styles.colorBubblesRing
+											: styles.colorBubblesNotActive
+									]}
+								>
 									<TouchableOpacity onPress={() => this.setState({ background: '#090C08' })}>
 										<View style={[ styles.colorBubbles, styles.colorBubbles1 ]} />
 									</TouchableOpacity>
