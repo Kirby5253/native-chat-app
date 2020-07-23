@@ -67,15 +67,12 @@ export default class Chat extends React.Component {
 					var errorMessage = error.message;
 					console.log(errorCode, errorMessage);
 				});
-				return this.setState({
+			} else {
+				//update user state with currently active user data
+				this.setState({
 					uid: user.uid
 				});
 			}
-
-			this.setState({
-				uid: user.uid
-			});
-			//update user state with currently active user data
 
 			// create a reference to the active user's documents
 			this.referenceMessagesUser = firebase.firestore().collection('messages').orderBy('createdAt', 'asc');
@@ -85,12 +82,11 @@ export default class Chat extends React.Component {
 	}
 
 	componentWillUnmount() {
-		this.logoutMessage(name);
+		this.logoutMessage(this.props.route.params.name);
 		// stop listening to authentication
 		this.authUnsubscribe;
 		// stop listening for changes
 		this.unsubscribeMessagesUser;
-		let name = this.props.route.params.name;
 	}
 
 	onCollectionUpdate = (querySnapshot) => {
