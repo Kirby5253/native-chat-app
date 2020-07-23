@@ -1,12 +1,24 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, YellowBox } from 'react-native';
 import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
 // Only needed if the keyboard is covering input
 import KeyboardSpacer from 'react-native-keyboard-spacer';
-var uuid = require('react-native-uuid');
+
+import { Buffer } from 'buffer';
+global.Buffer = Buffer;
 
 const firebase = require('firebase');
 require('firebase/firestore');
+
+import _ from 'lodash';
+
+YellowBox.ignoreWarnings([ 'Setting a timer' ]);
+const _console = _.clone(console);
+console.warn = (message) => {
+	if (message.indexOf('Setting a timer') <= -1) {
+		_console.warn(message);
+	}
+};
 
 //The apps chat component which renders a chat interface where users select a friend and chat with them
 export default class Chat extends React.Component {
@@ -27,11 +39,17 @@ export default class Chat extends React.Component {
 
 		// creates reference to messages collection in DB
 		this.referenceMessages = firebase.firestore().collection('messages');
-		let name = this.props.route.params.name;
 
 		this.state = {
-			messages: []
+			messages: [],
+			randomId: Math.floor(Math.random() * 1000000000000000)
 		};
+	}
+
+	randomizeId() {
+		this.setState({
+			randomId: Math.floor(Math.random() * 1000000000000000)
+		});
 	}
 
 	componentDidMount() {
@@ -83,6 +101,7 @@ export default class Chat extends React.Component {
 				user: data.user
 			});
 		});
+
 		messages.sort((a, b) => {
 			if (a.createdAt < b.createdAt) {
 				return 1;
@@ -102,10 +121,11 @@ export default class Chat extends React.Component {
 	};
 
 	addMessage(message) {
+		this.randomizeId();
 		this.referenceMessages.add({
-			createdAt: new Date(),
+			createdAt: Date.parse(new Date()),
 			system: false,
-			_id: uuid.v1(),
+			_id: this.state.randomId,
 			text: message,
 			user: {
 				_id: this.state.uid,
@@ -116,19 +136,20 @@ export default class Chat extends React.Component {
 	}
 
 	loginMessage(name) {
+		this.randomizeId();
 		this.referenceMessages.add({
-			createdAt: new Date(),
+			createdAt: Date.parse(new Date()),
 			system: true,
-			_id: uuid.v1(),
+			_id: this.state.randomId,
 			text: name + ' has entered the chat'
 		});
 	}
 
 	logoutMessage(name) {
 		this.referenceMessages.add({
-			createdAt: new Date(),
+			createdAt: Date.parse(new Date()),
 			system: true,
-			_id: uuid.v1(),
+			_id: this.state.randomId,
 			text: name + ' has left the chat'
 		});
 	}
