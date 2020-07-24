@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, YellowBox } from 'react-native';
-import { GiftedChat, Bubble, Send } from 'react-native-gifted-chat';
+import { View, YellowBox, AsyncStorage } from 'react-native';
+import { GiftedChat, Bubble, Send, InputToolbar } from 'react-native-gifted-chat';
 // Only needed if the keyboard is covering input
 import KeyboardSpacer from 'react-native-keyboard-spacer';
 
@@ -11,6 +11,8 @@ const firebase = require('firebase');
 require('firebase/firestore');
 
 import _ from 'lodash';
+
+import NetInfo from '@react-native-community/netinfo';
 
 YellowBox.ignoreWarnings([ 'Setting a timer' ]);
 const _console = _.clone(console);
@@ -42,51 +44,100 @@ export default class Chat extends React.Component {
 
 		this.state = {
 			messages: [],
-			randomId: Math.floor(Math.random() * 1000000000000000)
+			isConnected: true
 		};
 	}
 
 	randomizeId() {
+		let randomNumber = Math.floor(Math.random() * 1000000000000000000);
 		this.setState({
-			randomId: Math.floor(Math.random() * 1000000000000000)
+			randomId: randomNumber
 		});
 	}
 
 	componentDidMount() {
-		let name = this.props.route.params.name;
+		this.unsubscribeNetInfo = NetInfo.addEventListener((state) => {
+			this.handleConnectivityChange(state);
+		});
 
-		// when component mounts, a system message is sent to the chat
-		this.loginMessage(name);
+		// Determines if user is online
+		NetInfo.fetch().then((state) => {
+			const isConnected = state.isConnected;
+			if (isConnected) {
+				console.log('online');
+				this.setState({
+					isConnected: true
+				});
 
-		// listen to authentication events
-		this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-			if (!user) {
-				await firebase.auth().signInAnonymously().catch(function(error) {
-					// Handle Errors here.
-					var errorCode = error.code;
-					var errorMessage = error.message;
-					console.log(errorCode, errorMessage);
+				// when component mounts, a system message is sent to the chat
+				let name = this.props.route.params.name;
+				this.loginMessage(name);
+
+				// listen to authentication events
+				this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+					if (!user) {
+						await firebase.auth().signInAnonymously();
+					} else {
+						//update user state with currently active user data
+						this.setState({
+							uid: user.uid
+						});
+					}
+
+					// create a reference to the active user's documents
+					this.referenceMessagesUser = firebase
+						.firestore()
+						.collection('messages')
+						.orderBy('createdAt', 'asc');
+					// listen for collection changes for current user
+					this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate);
 				});
 			} else {
-				//update user state with currently active user data
+				console.log('offline');
 				this.setState({
-					uid: user.uid
+					isConnected: false
 				});
+				// Retrieves messages from cache
+				this.getMessages();
 			}
-
-			// create a reference to the active user's documents
-			this.referenceMessagesUser = firebase.firestore().collection('messages').orderBy('createdAt', 'asc');
-			// listen for collection changes for current user
-			this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate);
 		});
 	}
 
 	componentWillUnmount() {
-		this.logoutMessage(this.props.route.params.name);
+		// this.logoutMessage(this.props.route.params.name);
 		// stop listening to authentication
 		this.authUnsubscribe;
 		// stop listening for changes
 		this.unsubscribeMessagesUser;
+		this.unsubscribeNetInfo;
+	}
+
+	async getMessages() {
+		let messages = '';
+		try {
+			messages = (await AsyncStorage.getItem('messages')) || [];
+			this.setState({
+				messages: JSON.parse(messages)
+			});
+		} catch (error) {
+			console.log(error.message);
+		}
+	}
+
+	async saveMessages() {
+		try {
+			await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
+		} catch (error) {
+			console.log(error.message);
+		}
+	}
+
+	async deleteMessages() {
+		try {
+			await AsyncStorage.removeItem('messages');
+		} catch (error) {
+			console.log(error.message);
+		}
 	}
 
 	onCollectionUpdate = (querySnapshot) => {
@@ -114,20 +165,49 @@ export default class Chat extends React.Component {
 		this.setState({
 			messages
 		});
+		this.saveMessages();
+	};
+
+	handleConnectivityChange = (state) => {
+		const isConnected = state.isConnected;
+
+		if (isConnected == true) {
+			console.log('online');
+			this.setState({
+				isConnected: true
+			});
+			this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
+				if (!user) {
+					await firebase.auth().signInAnonymously();
+				} else {
+					//update user state with currently active user data
+					this.setState({
+						uid: user.uid
+					});
+				}
+			});
+		} else {
+			this.setState({
+				isConnected: false
+			});
+			console.log('offline');
+			this.getMessages();
+		}
 	};
 
 	// This appends the message to the state of the chat
 	onSend = (messages = []) => {
 		var last_element = messages[messages.length - 1];
 		this.addMessage(last_element.text);
+		this.saveMessages();
 	};
 
 	addMessage(message) {
-		this.randomizeId();
+		let randomNumber = Math.floor(Math.random() * 1000000000000000000);
 		this.referenceMessages.add({
 			createdAt: Date.parse(new Date()),
 			system: false,
-			_id: this.state.randomId,
+			_id: randomNumber,
 			text: message,
 			user: {
 				_id: this.state.uid,
@@ -137,21 +217,24 @@ export default class Chat extends React.Component {
 		});
 	}
 
+	// Sends system message that the user has entecred the chat
 	loginMessage(name) {
-		this.randomizeId();
+		let randomNumber = Math.floor(Math.random() * 1000000000000000000);
 		this.referenceMessages.add({
 			createdAt: Date.parse(new Date()),
 			system: true,
-			_id: this.state.randomId,
+			_id: randomNumber,
 			text: name + ' has entered the chat'
 		});
 	}
 
+	// Sends system message that the user has left the chat
 	logoutMessage(name) {
+		let randomNumber = Math.floor(Math.random() * 1000000000000000000);
 		this.referenceMessages.add({
 			createdAt: Date.parse(new Date()),
 			system: true,
-			_id: this.state.randomId,
+			_id: randomNumber,
 			text: name + ' has left the chat'
 		});
 	}
@@ -173,6 +256,13 @@ export default class Chat extends React.Component {
 	// Customize blue send button to correct text style change
 	renderSend(props) {
 		return <Send {...props} textStyle={{ color: '#0a84fa' }} label={'Send'} />;
+	}
+
+	renderInputToolbar(props) {
+		if (this.state.isConnected == false) {
+		} else {
+			return <InputToolbar {...props} />;
+		}
 	}
 
 	render() {
@@ -197,6 +287,7 @@ export default class Chat extends React.Component {
 					// Changes color of the bubble
 					// renderBubble={this.renderBubble.bind(this)}
 					renderSend={this.renderSend.bind(this)}
+					renderInputToolbar={this.renderInputToolbar.bind(this)}
 					messages={this.state.messages}
 					onSend={(messages) => this.onSend(messages)}
 					user={{
