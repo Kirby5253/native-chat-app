@@ -16,7 +16,7 @@ import _ from 'lodash';
 import NetInfo from '@react-native-community/netinfo';
 import MapView from 'react-native-maps';
 
-YellowBox.ignoreWarnings([ 'Setting a timer' ]);
+YellowBox.ignoreWarnings([ 'Warning: ...' ]);
 const _console = _.clone(console);
 console.warn = (message) => {
 	if (message.indexOf('Setting a timer') <= -1) {
@@ -42,7 +42,7 @@ export default class Chat extends React.Component {
 		}
 
 		// creates reference to messages collection in DB
-		this.referenceMessages = firebase.firestore().collection('messages');
+		this.referenceMessages = firebase.firestore().collection('messagesNew');
 
 		this.state = {
 			messages: []
@@ -88,7 +88,7 @@ export default class Chat extends React.Component {
 					// create a reference to the active user's documents
 					this.referenceMessagesUser = firebase
 						.firestore()
-						.collection('messages')
+						.collection('messagesNew')
 						.orderBy('createdAt', 'asc');
 					// listen for collection changes for current user
 					this.unsubscribeMessagesUser = this.referenceMessagesUser.onSnapshot(this.onCollectionUpdate);
@@ -148,14 +148,15 @@ export default class Chat extends React.Component {
 			// get the QueryDocumentSnapshot's data
 			var data = doc.data();
 			messages.push({
-				text: data.text,
+				text: data.text.toString(),
 				system: data.system,
 				_id: data._id,
 				createdAt: data.createdAt,
-				user: data.user
+				user: data.user,
+				image: data.image || '',
+				location: data.location
 			});
 		});
-
 		messages.sort((a, b) => {
 			if (a.createdAt < b.createdAt) {
 				return 1;
@@ -198,23 +199,28 @@ export default class Chat extends React.Component {
 
 	// This appends the message to the state of the chat
 	onSend = (messages = []) => {
-		var last_element = messages[messages.length - 1];
-		this.addMessage(last_element.text);
-		this.saveMessages();
+		this.setState(
+			(previousState) => ({
+				messages: GiftedChat.append(previousState.messages, messages)
+			}),
+			() => {
+				this.addMessage();
+				this.saveMessages();
+			}
+		);
 	};
 
-	addMessage(message) {
-		let randomNumber = Math.floor(Math.random() * 1000000000000000000);
+	addMessage() {
+		const message = this.state.messages[0];
+
 		this.referenceMessages.add({
-			createdAt: Date.parse(new Date()),
-			system: false,
-			_id: randomNumber,
-			text: message,
-			user: {
-				_id: this.state.uid,
-				avatar: '',
-				name: this.props.route.params.name
-			}
+			_id: message._id,
+			text: message.text || '',
+			createdAt: Date.parse(message.createdAt),
+			user: message.user,
+			image: message.image || '',
+			location: message.location || null,
+			sent: true
 		});
 	}
 
@@ -320,8 +326,11 @@ export default class Chat extends React.Component {
 					renderCustomView={this.renderCustomView.bind(this)}
 					messages={this.state.messages}
 					onSend={(messages) => this.onSend(messages)}
+					image={this.state.image}
 					user={{
-						_id: this.state.uid
+						_id: this.state.uid,
+						name,
+						avatar: ''
 					}}
 				/>
 
