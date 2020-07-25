@@ -43,8 +43,7 @@ export default class Chat extends React.Component {
 		this.referenceMessages = firebase.firestore().collection('messages');
 
 		this.state = {
-			messages: [],
-			isConnected: true
+			messages: []
 		};
 	}
 
