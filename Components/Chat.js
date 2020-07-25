@@ -3,6 +3,7 @@ import { View, YellowBox, AsyncStorage } from 'react-native';
 import { GiftedChat, Bubble, Send, InputToolbar } from 'react-native-gifted-chat';
 // Only needed if the keyboard is covering input
 import KeyboardSpacer from 'react-native-keyboard-spacer';
+import CustomActions from './CustomActions';
 
 import { Buffer } from 'buffer';
 global.Buffer = Buffer;
@@ -13,6 +14,7 @@ require('firebase/firestore');
 import _ from 'lodash';
 
 import NetInfo from '@react-native-community/netinfo';
+import MapView from 'react-native-maps';
 
 YellowBox.ignoreWarnings([ 'Setting a timer' ]);
 const _console = _.clone(console);
@@ -264,6 +266,33 @@ export default class Chat extends React.Component {
 		}
 	}
 
+	renderCustomActions(props) {
+		return <CustomActions {...props} />;
+	}
+
+	renderCustomView(props) {
+		const { currentMessage } = props;
+		if (currentMessage.location) {
+			return (
+				<MapView
+					style={{
+						width: 150,
+						height: 100,
+						borderRadius: 13,
+						margin: 3
+					}}
+					region={{
+						latitude: currentMessage.location.latitude,
+						longitude: currentMessage.location.longitude,
+						latitudeDelta: 0.0922,
+						longitudeDelta: 0.0421
+					}}
+				/>
+			);
+		}
+		return null;
+	}
+
 	render() {
 		let name = this.props.route.params.name;
 		let background = this.props.route.params.background;
@@ -287,6 +316,8 @@ export default class Chat extends React.Component {
 					// renderBubble={this.renderBubble.bind(this)}
 					renderSend={this.renderSend.bind(this)}
 					renderInputToolbar={this.renderInputToolbar.bind(this)}
+					renderActions={this.renderCustomActions}
+					renderCustomView={this.renderCustomView.bind(this)}
 					messages={this.state.messages}
 					onSend={(messages) => this.onSend(messages)}
 					user={{
