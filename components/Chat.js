@@ -76,13 +76,17 @@ export default class Chat extends React.Component {
 
 				// listen to authentication events
 				this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-					if (!user) {
-						await firebase.auth().signInAnonymously();
-					} else {
-						//update user state with currently active user data
-						this.setState({
-							uid: user.uid
-						});
+					try {
+						if (!user) {
+							await firebase.auth().signInAnonymously();
+						} else {
+							//update user state with currently active user data
+							this.setState({
+								uid: user.uid
+							});
+						}
+					} catch (error) {
+						console.log(error.message);
 					}
 
 					// create a reference to the active user's documents
@@ -110,10 +114,10 @@ export default class Chat extends React.Component {
 		this.authUnsubscribe;
 		// stop listening for changes
 		this.unsubscribeMessagesUser;
-		this.unsubscribeNetInfo;
+		NetInfo.isConnected.removeEventListener('connectionChange', this.handleConnectivityChange);
 	}
 
-	async getMessages() {
+	getMessages = async () => {
 		let messages = '';
 		try {
 			messages = (await AsyncStorage.getItem('messages')) || [];
@@ -123,30 +127,30 @@ export default class Chat extends React.Component {
 		} catch (error) {
 			console.log(error.message);
 		}
-	}
+	};
 
-	async saveMessages() {
+	saveMessages = async () => {
 		try {
 			await AsyncStorage.setItem('messages', JSON.stringify(this.state.messages));
 		} catch (error) {
 			console.log(error.message);
 		}
-	}
+	};
 
-	async deleteMessages() {
+	deleteMessages = async () => {
 		try {
 			await AsyncStorage.removeItem('messages');
 		} catch (error) {
 			console.log(error.message);
 		}
-	}
+	};
 
 	onCollectionUpdate = (querySnapshot) => {
 		const messages = [];
 		// go through each doc
 		querySnapshot.forEach((doc) => {
 			// get the QueryDocumentSnapshot's data
-			var data = doc.data();
+			let data = doc.data();
 			messages.push({
 				text: data.text.toString(),
 				system: data.system,
@@ -179,13 +183,17 @@ export default class Chat extends React.Component {
 				isConnected: true
 			});
 			this.authUnsubscribe = firebase.auth().onAuthStateChanged(async (user) => {
-				if (!user) {
-					await firebase.auth().signInAnonymously();
-				} else {
-					//update user state with currently active user data
-					this.setState({
-						uid: user.uid
-					});
+				try {
+					if (!user) {
+						await firebase.auth().signInAnonymously();
+					} else {
+						//update user state with currently active user data
+						this.setState({
+							uid: user.uid
+						});
+					}
+				} catch (error) {
+					console.log(error.message);
 				}
 			});
 		} else {
@@ -225,7 +233,7 @@ export default class Chat extends React.Component {
 	}
 
 	// Sends system message that the user has entecred the chat
-	loginMessage(name) {
+	loginMessage = (name) => {
 		let randomNumber = Math.floor(Math.random() * 1000000000000000000);
 		this.referenceMessages.add({
 			createdAt: Date.parse(new Date()),
@@ -233,10 +241,10 @@ export default class Chat extends React.Component {
 			_id: randomNumber,
 			text: name + ' has entered the chat'
 		});
-	}
+	};
 
 	// Sends system message that the user has left the chat
-	logoutMessage(name) {
+	logoutMessage = (name) => {
 		let randomNumber = Math.floor(Math.random() * 1000000000000000000);
 		this.referenceMessages.add({
 			createdAt: Date.parse(new Date()),
@@ -244,10 +252,10 @@ export default class Chat extends React.Component {
 			_id: randomNumber,
 			text: name + ' has left the chat'
 		});
-	}
+	};
 
 	// Allows customization of chat bubble color
-	renderBubble(props) {
+	renderBubble = (props) => {
 		return (
 			<Bubble
 				{...props}
@@ -258,25 +266,25 @@ export default class Chat extends React.Component {
 				}}
 			/>
 		);
-	}
+	};
 
 	// Customize blue send button to correct text style change
-	renderSend(props) {
+	renderSend = (props) => {
 		return <Send {...props} textStyle={{ color: '#0a84fa' }} label={'Send'} />;
-	}
+	};
 
-	renderInputToolbar(props) {
+	renderInputToolbar = (props) => {
 		if (this.state.isConnected == false) {
 		} else {
 			return <InputToolbar {...props} />;
 		}
-	}
+	};
 
-	renderCustomActions(props) {
+	renderCustomActions = (props) => {
 		return <CustomActions {...props} />;
-	}
+	};
 
-	renderCustomView(props) {
+	renderCustomView = (props) => {
 		const { currentMessage } = props;
 		if (currentMessage.location) {
 			return (
@@ -297,7 +305,7 @@ export default class Chat extends React.Component {
 			);
 		}
 		return null;
-	}
+	};
 
 	render() {
 		let name = this.props.route.params.name;

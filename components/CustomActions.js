@@ -22,19 +22,23 @@ export default class CustomActions extends Component {
 			options,
 			cancelButtonIndex
 		}, async (buttonIndex) => {
-			switch (buttonIndex) {
-				case 0:
-					console.log('user wants to pick an image');
-					this.pickImage();
-					return;
-				case 1:
-					console.log('user wants to take a photo');
-					this.takePhoto();
-					return;
-				case 2:
-					console.log('user wants to get their location');
-					this.getLocation();
-				default:
+			try {
+				switch (buttonIndex) {
+					case 0:
+						console.log('user wants to pick an image');
+						this.pickImage();
+						return;
+					case 1:
+						console.log('user wants to take a photo');
+						this.takePhoto();
+						return;
+					case 2:
+						console.log('user wants to get their location');
+						this.getLocation();
+					default:
+				}
+			} catch (error) {
+				console.log(error.message);
 			}
 		});
 	};
@@ -108,19 +112,23 @@ export default class CustomActions extends Component {
 	};
 
 	getLocation = async () => {
-		const { status } = await Permissions.askAsync(Permissions.LOCATION);
+		try {
+			const { status } = await Permissions.askAsync(Permissions.LOCATION);
 
-		if (status === 'granted') {
-			let result = await Location.getCurrentPositionAsync({});
+			if (status === 'granted') {
+				let result = await Location.getCurrentPositionAsync({});
 
-			if (result) {
-				this.props.onSend({
-					location: {
-						latitude: result.coords.latitude,
-						longitude: result.coords.longitude
-					}
-				});
+				if (result) {
+					this.props.onSend({
+						location: {
+							latitude: result.coords.latitude,
+							longitude: result.coords.longitude
+						}
+					});
+				}
 			}
+		} catch (error) {
+			console.log(error.message);
 		}
 	};
 
