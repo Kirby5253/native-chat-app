@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: CustomActions.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: CustomActions.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { Component } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import PropTypes from 'prop-types';
+import firebase from 'firebase';
+
+import * as Permissions from 'expo-permissions';
+import * as ImagePicker from 'expo-image-picker';
+
+import * as Location from 'expo-location';
+import MapView from 'react-native-maps';
+
+export default class CustomActions extends Component {
+	state = {
+		image: null
+	};
+
+	onActionPress = () => {
+		const options = [ 'Choose Image From Library', 'Take Picture', 'Send Location', 'Cancel' ];
+
+		const cancelButtonIndex = options.length - 1;
+		this.context.actionSheet().showActionSheetWithOptions({
+			options,
+			cancelButtonIndex
+		}, async (buttonIndex) => {
+			try {
+				switch (buttonIndex) {
+					case 0:
+						console.log('user wants to pick an image');
+						this.pickImage();
+						return;
+					case 1:
+						console.log('user wants to take a photo');
+						this.takePhoto();
+						return;
+					case 2:
+						console.log('user wants to get their location');
+						this.getLocation();
+					default:
+				}
+			} catch (error) {
+				console.log(error.message);
+			}
+		});
+	};
+
+	//let user pick an image
+	pickImage = async () => {
+		try {
+			const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
+
+			if (status === 'granted') {
+				let result = await ImagePicker.launchImageLibraryAsync({
+					mediaTypes: 'Images'
+				}).catch((error) => console.log(error));
+
+				if (!result.cancelled) {
+					const imageURL = await this.uploadImage(result.uri);
+					this.props.onSend({ image: imageURL });
+				}
+			}
+		} catch (error) {
+			console.log(error.message);
+		}
+	};
+
+	/**
+	* Requests permission to access camera and library. 
+	* If users accept, the camera is launched. Users take a photo and the picture is uploaded to firestore storage with uploadImage. Once uploaded the picture's url is sent to the firestore db to add to messages with onSend.
+	* if users don't take a picture, or decline the user request for access, the action is cancelled
+	* @async
+	* @function takePhoto
+	* @return {@Promise&lt;string>} imageUrl
+	*/
+	takePhoto = async () => {
+		try {
+			const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL, Permissions.CAMERA);
+
+			if (status === 'granted') {
+				let result = await ImagePicker.launchCameraAsync({
+					mediaTypes: 'Images' // images are only media type allowed
+				}).catch((error) => console.log(error));
+
+				if (!result.cancelled) {
+					const imageURL = await this.uploadImage(result.uri);
+					this.props.onSend({ image: imageURL });
+				}
+			}
+		} catch (error) {
+			console.log(error.message);
+		}
+	};
+
+	uploadImage = async (uri) => {
+		try {
+			const blob = await new Promise((resolve, reject) => {
+				const xhr = new XMLHttpRequest();
+				xhr.onload = () => {
+					resolve(xhr.response);
+				};
+				xhr.onerror = (error) => {
+					console.error(error);
+					reject(new TypeError('Network Request Failed!'));
+				};
+				xhr.responseType = 'blob';
+				xhr.open('GET', uri, true);
+				xhr.send(null);
+			});
+			const getImageName = uri.split('/');
+			const imageArrayLength = getImageName[getImageName.length - 1];
+			const ref = firebase.storage().ref().child(`images/${imageArrayLength}`);
+
+			const snapshot = await ref.put(blob);
+			blob.close();
+			const imageURL = await snapshot.ref.getDownloadURL();
+			return imageURL;
+		} catch (error) {
+			console.log(error.message);
+		}
+	};
+
+	getLocation = async () => {
+		try {
+			const { status } = await Permissions.askAsync(Permissions.LOCATION);
+
+			if (status === 'granted') {
+				let result = await Location.getCurrentPositionAsync({});
+
+				if (result) {
+					this.props.onSend({
+						location: {
+							latitude: result.coords.latitude,
+							longitude: result.coords.longitude
+						}
+					});
+				}
+			}
+		} catch (error) {
+			console.log(error.message);
+		}
+	};
+
+	render() {
+		return (
+			&lt;TouchableOpacity
+				accessible={true}
+				accessibilityLabel="Click for more sharing options"
+				accessibilityHint="Let’s you choose to send an image or your geolocation."
+				style={[ styles.container ]}
+				onPress={this.onActionPress}
+			>
+				&lt;View style={[ styles.wrapper, this.props.wrapperStyle ]}>
+					&lt;Text style={[ styles.iconText, this.props.iconText ]}>+&lt;/Text>
+				&lt;/View>
+			&lt;/TouchableOpacity>
+		);
+	}
+}
+
+const styles = StyleSheet.create({
+	container: {
+		width: 26,
+		height: 26,
+		marginLeft: 10,
+		marginBottom: 10
+	},
+	wrapper: {
+		borderRadius: 13,
+		borderColor: '#b2b2b2',
+		borderWidth: 2,
+		flex: 1
+	},
+	iconText: {
+		color: '#b2b2b2',
+		fontWeight: 'bold',
+		fontSize: 16,
+		backgroundColor: 'transparent',
+		textAlign: 'center'
+	}
+});
+
+CustomActions.contextTypes = {
+	actionSheet: PropTypes.func
+};
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#takePhoto">takePhoto</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.5</a> on Mon Jul 27 2020 14:53:24 GMT-0500 (Central Daylight Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
