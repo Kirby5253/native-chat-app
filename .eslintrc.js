@@ -27,5 +27,7 @@ module.exports = {
     'linebreak-style': 0,
     'react/prop-types': 0,
     'object-curly-newline': ['error', { multiline: true }],
+    'no-underscore-dangle': 0,
+    'react/jsx-props-no-spreading': 'off',
   },
 };

@@ -1,3 +1,4 @@
+// style for the start component
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
@@ -39,13 +40,12 @@ export default StyleSheet.create({
   },
   nameInputField: {
     width: '88%',
-    borderColor: 'grey',
-    borderWidth: 2,
     padding: 5,
     fontSize: 16,
     fontWeight: '300',
     color: '#757083',
     opacity: 50,
+    flex: 0.8,
   },
   chatButton: {
     backgroundColor: '#757083',
@@ -93,4 +93,27 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   colorBubblesNotActive: { backgroundColor: 'white' },
+  SectionStyle: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: 'grey',
+    height: 40,
+    borderRadius: 5,
+    margin: 10,
+    width: '88%',
+  },
+  ImageStyle: {
+    padding: 10,
+    // margin: 5,
+    // height: 25,
+    marginLeft: -20,
+    marginRight: 5,
+    width: 25,
+    opacity: 50,
+    // resizeMode: 'stretch',
+    alignItems: 'center',
+  },
 });

@@ -1,12 +1,25 @@
 /* eslint-disable max-len */
 import React from 'react';
-import { View, Text, ImageBackground, TouchableOpacity } from 'react-native';
+import { View, Text, ImageBackground, TouchableOpacity, Image } from 'react-native';
 import { TextInput } from 'react-native-gesture-handler';
 import styles from './styles/Start.component.style';
 // Defines img path for background
 const image = require('../assets/startBackgroundImage.png');
+const usernameIcon = require('../assets/userIcon2.png');
 
 // The apps starting component which renders an input where users set a name and them for their profile
+
+/**
+ * The apps starting component which renders an input where users
+ * set a name and them for their profile
+ * @class Start
+ * @requires react
+ * @requires react-native
+ * @requires react-native-gesture-handler
+ * @requires image from '../assets/startBackgroundImage.png'
+ * @requires usernameIcon from ../assets/userIcon2.png'
+ * @requires styles from './styles/Start.component.style'
+ */
 export default class Start extends React.Component {
   constructor(props) {
     super(props);
@@ -30,13 +43,16 @@ export default class Start extends React.Component {
 
           {/* Main interactive section of start page  */}
           <View style={styles.container2}>
-            {/* Allow users to enter their name */}
-            <TextInput
-              style={styles.nameInputField}
-              placeholder="Your Name"
-              onChangeText={(text) => this.setState({ name: text })}
-              value={name}
-            />
+            <View style={styles.SectionStyle}>
+              <Image source={usernameIcon} style={styles.ImageStyle} />
+              {/* Allow users to enter their name */}
+              <TextInput
+                style={styles.nameInputField}
+                placeholder="Your Name"
+                onChangeText={(text) => this.setState({ name: text })}
+                value={name}
+              />
+            </View>
 
             {/* Grouping of the color selection section */}
             <View style={styles.colorPickContainer}>
