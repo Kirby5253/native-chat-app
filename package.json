@@ -13,11 +13,14 @@
     "@react-navigation/native": "^5.7.1",
     "@react-navigation/stack": "^5.7.1",
     "buffer": "^5.6.0",
+    "eslint-plugin-react": "7.20.0",
     "expo": "~36.0.0",
     "expo-image-picker": "~8.0.1",
     "expo-location": "8.0.0",
     "expo-permissions": "~8.0.0",
     "firebase": "7.9.0",
+    "grpc": "^1.24.3",
+    "lodash": "^4.17.19",
     "moment": "^2.27.0",
     "prop-types": "^15.7.2",
     "react": "~16.9.0",
@@ -36,7 +39,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",
-    "babel-preset-expo": "~8.1.0"
+    "babel-eslint": "^10.1.0",
+    "eslint": "5.16.0",
+    "eslint-config-airbnb": "^18.2.0",
+    "eslint-plugin-import": "2.21.2",
+    "eslint-plugin-jsx-a11y": "6.3.0",
+    "eslint-plugin-react-hooks": "4",
+    "eslint-plugin-react-native": "^3.8.1"
   },
   "private": true
 }
