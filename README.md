@@ -12,6 +12,11 @@ To run mod after installing all dependencies:
 $ expo start
 ```
 
+Since this is using expo, make sure that expo is installed globally
+```sh
+$ npm install expo -g
+```
+For more specific expo instructions, visit https://docs.expo.io/get-started/installation/
 
 
   - The app needs a smartphone or emulator to run/test the app
@@ -80,3 +85,8 @@ If you'd like to update the Firebase credentials you would change the following 
     react-navigation
     react-navigation-stack
 ````
+## Chat UI Example
+
+Example used an emulator which was significantly slower than on an actual device
+
+![User Interface](/images/test.gif)
