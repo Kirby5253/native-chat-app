@@ -1,3 +1,4 @@
+// style for the customActions component
 import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({

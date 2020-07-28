@@ -11,7 +11,28 @@ import * as Location from 'expo-location';
 
 import styles from './styles/CustomActions.component.style';
 
+/**
+ * The apps custom action component which renders the action window and functions for chat
+ * where users select a image/take picture/or send location
+ * @class CustomActions
+ * @requires react
+ * @requires react-native
+ * @requires prop-types
+ * @requires expo-permissions
+ * @requires expo-image-picker
+ * @requires expo-location
+ * @requires styles from './styles/CustomActions.component.style'
+ * @requires firebase/firestore
+ */
 export default class CustomActions extends Component {
+  /**
+   * function that handles pressing the customActions button,
+   * displays options [ choose image, take picture, send location, or cancel ].
+   * waits for user to select option
+   * @function onActionPress
+   * @async
+   * @return {function} runs corresponding function for each option choice
+   */
   onActionPress = () => {
     const { actionSheet } = this.context;
     const options = ['Choose Image From Library', 'Take Picture', 'Send Location', 'Cancel'];
@@ -46,13 +67,20 @@ export default class CustomActions extends Component {
     );
   };
 
-  // let user pick an image
+  /**
+   * let user pick an image from current library/gallery, uploads to firebase storage,
+   * then sends result to firestore as a url
+   * @function pickImage
+   * @async
+   * @return {function} onSend(imageURL)
+   */
   pickImage = async () => {
     try {
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL);
 
       if (status === 'granted') {
         const result = await ImagePicker.launchImageLibraryAsync({
+          // restricted to only images
           mediaTypes: 'Images',
         }).catch((error) => console.log(error));
 
@@ -67,7 +95,13 @@ export default class CustomActions extends Component {
     }
   };
 
-  // let user take an image and send
+  /**
+   * let user take an image, uploads to firebase storage,
+   * then sends result to firestore as a url
+   * @function takePhoto
+   * @async
+   * @return {function} onSend(imageURL)
+   */
   takePhoto = async () => {
     try {
       const { status } = await Permissions.askAsync(Permissions.CAMERA_ROLL, Permissions.CAMERA);
@@ -88,6 +122,13 @@ export default class CustomActions extends Component {
     }
   };
 
+  /**
+   * handles upload to firebase storage,
+   * then sends result to function
+   * @function uploadImage
+   * @async
+   * @return {Promise<string>}
+   */
   // eslint-disable-next-line consistent-return
   uploadImage = async (uri) => {
     try {
@@ -117,6 +158,12 @@ export default class CustomActions extends Component {
     }
   };
 
+  /**
+   * lets user send current location
+   * @function getLocation
+   * @async
+   * @return {function} onSend(location object)
+   */
   getLocation = async () => {
     try {
       const { status } = await Permissions.askAsync(Permissions.LOCATION);
