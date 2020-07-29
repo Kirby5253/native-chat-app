@@ -85,8 +85,3 @@ If you'd like to update the Firebase credentials you would change the following 
     react-navigation
     react-navigation-stack
 ````
-## Chat UI Example
-
-Example used an emulator which was significantly slower than on an actual device
-
-![User Interface](/images/test.gif)
