@@ -20,7 +20,7 @@
     "expo-permissions": "~8.0.0",
     "firebase": "7.9.0",
     "grpc": "^1.24.3",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "moment": "^2.27.0",
     "prop-types": "^15.7.2",
     "react": "~16.9.0",
