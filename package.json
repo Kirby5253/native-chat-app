@@ -19,7 +19,7 @@
     "expo-location": "8.0.0",
     "expo-permissions": "~8.0.0",
     "firebase": "7.9.0",
-    "grpc": "^1.24.3",
+    "grpc": "^1.24.11",
     "lodash": "^4.17.19",
     "moment": "^2.27.0",
     "prop-types": "^15.7.2",
